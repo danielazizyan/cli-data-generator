@@ -11,7 +11,6 @@ Clone the repo and install dependencies:
 
 ```bash
 git clone https://github.com/gridu/Python-Basic--Daniel-Azizyan.git
-cd magicgenerator
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
