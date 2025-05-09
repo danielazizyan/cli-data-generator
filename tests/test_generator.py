@@ -6,6 +6,9 @@ from magicgenerator.generator import generate_record, write_jsonl_file
 
 @pytest.fixture
 def simple_schema_model():
+    """
+    Small schema with int, str, and timestamp fields.
+    """
     raw = {
         "a": "int: rand(0,2)",
         "b": "str: [\"x\", \"y\"]",
@@ -15,6 +18,9 @@ def simple_schema_model():
 
 
 def test_generate_record_types(simple_schema_model):
+    """
+    Record has correct field types and values.
+    """
     rec = generate_record(simple_schema_model)
     assert set(rec.keys()) == set(simple_schema_model.keys())
     assert isinstance(rec["a"], int)
@@ -25,6 +31,9 @@ def test_generate_record_types(simple_schema_model):
 
 
 def test_write_jsonl_file_creates_and_content(tmp_path, simple_schema_model):
+    """
+    .jsonl file is created with correct records.
+    """
     out = tmp_path / "out.jsonl"
     write_jsonl_file(out, simple_schema_model, data_lines=5)
     assert out.exists()

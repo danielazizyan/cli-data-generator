@@ -3,6 +3,9 @@ from magicgenerator.parser import build_schema_model, SchemaField
 
 
 def test_build_model_single_field():
+    """
+    One valid field builds correct SchemaField.
+    """
     raw = {"a": "str:rand"}
     model = build_schema_model(raw)
     assert set(model.keys()) == {"a"}
@@ -11,6 +14,9 @@ def test_build_model_single_field():
 
 
 def test_build_model_multiple_fields():
+    """
+    Multiple fields build expected SchemaField objects.
+    """
     raw = {
         "id": "int:rand(10, 20)",
         "name": "str:[\"x\",\"y\"]",
@@ -33,6 +39,9 @@ def test_build_model_multiple_fields():
 
 
 def test_build_model_invalid_spec():
+    """
+    Invalid specs raise SystemExit.
+    """
     with pytest.raises(SystemExit):
         build_schema_model({"a": "foo:bar"})
     with pytest.raises(SystemExit):

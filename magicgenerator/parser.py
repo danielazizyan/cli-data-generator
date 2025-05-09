@@ -52,7 +52,7 @@ def load_schema(schema_arg: str) -> Dict[str, str]:
         sys.exit(1)
 
     for key, val in schema.items():
-        if not isinstance(key, str) or not isinstance(val, str):
+        if not isinstance(val, str):
             logger.error(
                 "Schema entries must be str -> str;"
                 "got key=%r (%s), val=%r (%s)",

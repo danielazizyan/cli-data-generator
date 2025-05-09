@@ -8,6 +8,9 @@ SCHEMA = json.dumps({"x": "int:rand(1,3)", "y": "str:[\"a\",\"b\"]"})
 
 
 def test_multiprocess_creates_correct_number(tmp_path):
+    """
+    Runs the CLI with multiprocessing and checks 4 .jsonl files are created.
+    """
     cmd = [
         sys.executable, str(SCRIPT), str(tmp_path),
         "--files_count", "4",
@@ -32,6 +35,9 @@ def test_multiprocess_creates_correct_number(tmp_path):
 
 
 def test_stdout_mode(tmp_path):
+    """
+    Runs the CLI in stdout mode and checks correct number of JSON lines.
+    """
     data_lines = 7
     cmd = [
         sys.executable, str(SCRIPT), str(tmp_path),
