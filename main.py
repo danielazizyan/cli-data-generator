@@ -5,8 +5,8 @@ from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from magicgenerator.config import read_defaults
-from magicgenerator.generator import generate_record, write_jsonl_file
-from magicgenerator.parser import load_schema, build_schema_model, SchemaField
+from magicgenerator.generator import DataGenerator
+from magicgenerator.parser import SchemaParser, SchemaField
 from magicgenerator.cli import build_parser
 from magicgenerator.logger import get_logger
 from magicgenerator.utils import (
@@ -47,7 +47,8 @@ def _generate_one(i: int, output_dir: Path, base_name: str, file_prefix: str,
         else f"{base_name}.jsonl"
     )
     out_path = output_dir / filename
-    write_jsonl_file(out_path, schema_model, data_lines)
+    gen = DataGenerator(schema_model)
+    gen.write_jsonl_file(out_path, data_lines)
     return out_path
 
 
@@ -85,13 +86,13 @@ def main():
     logger.info("Validated all inputs")
 
     # 3) Load raw schema (dict[str,str])
-    raw_schema = load_schema(args.data_schema)
+    raw_schema = SchemaParser.load_schema(args.data_schema)
 
     # 3) Parse that raw schema into SchemaField objects
-    schema_model = build_schema_model(raw_schema)
-    logger.info(
-        "Built schema model with fields: %s",
-        list(schema_model.keys()))
+    schema_model = SchemaParser.build_schema_model(raw_schema)
+    logger.info("Built schema model with fields: %s",
+                ", ".join(schema_model.keys()))
+
 
     # 4) Clear old files if clear_path is True
     if args.clear_path:
@@ -100,8 +101,9 @@ def main():
     # 5) Generate and output data
     if args.files_count == 0:
         logger.info("Entering stdout mode (no files will be written)")
+        gen = DataGenerator(schema_model)
         for _ in range(args.data_lines):
-            rec = generate_record(schema_model)
+            rec = gen.generate_record()
             print(json.dumps(rec))
 
     elif args.files_count == 1:
@@ -133,8 +135,11 @@ def main():
             ]
 
             for future in as_completed(futures):
-                path = future.result()
-                logger.info("Completed %s", path)
+                try:
+                    path = future.result()
+                    logger.info("Completed %s", path)
+                except Exception as e:
+                    logger.error("Worker failed to generate a file: %s", e)
 
 
 if __name__ == "__main__":

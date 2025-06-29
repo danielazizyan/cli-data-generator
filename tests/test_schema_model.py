@@ -1,5 +1,5 @@
 import pytest
-from magicgenerator.parser import build_schema_model, SchemaField
+from magicgenerator.parser import SchemaParser, SchemaField
 
 
 def test_build_model_single_field():
@@ -7,7 +7,7 @@ def test_build_model_single_field():
     One valid field builds correct SchemaField.
     """
     raw = {"a": "str:rand"}
-    model = build_schema_model(raw)
+    model = SchemaParser.build_schema_model(raw)
     assert set(model.keys()) == {"a"}
     sf = model["a"]
     assert sf == SchemaField(type="str", mode="rand_uuid", args=[], const=None)
@@ -22,7 +22,7 @@ def test_build_model_multiple_fields():
         "name": "str:[\"x\",\"y\"]",
         "ts": "timestamp:"
     }
-    model = build_schema_model(raw)
+    model = SchemaParser.build_schema_model(raw)
     assert set(model.keys()) == {"id", "name", "ts"}
     sf_id = model["id"]
     sf_name = model["name"]
@@ -43,8 +43,8 @@ def test_build_model_invalid_spec():
     Invalid specs raise SystemExit.
     """
     with pytest.raises(SystemExit):
-        build_schema_model({"a": "foo:bar"})
+        SchemaParser.build_schema_model({"a": "foo:bar"})
     with pytest.raises(SystemExit):
-        build_schema_model({"a": "int:rand(a,b)"})
+        SchemaParser.build_schema_model({"a": "int:rand(a,b)"})
     with pytest.raises(SystemExit):
-        build_schema_model({"a": "str:[1,2]"})
+        SchemaParser.build_schema_model({"a": "str:[1,2]"})

@@ -1,6 +1,6 @@
 import pytest
 from tests.conftest import get_test_logger
-from magicgenerator.parser import parse_field_spec, SchemaField
+from magicgenerator.parser import SchemaParser, SchemaField
 
 
 @pytest.mark.parametrize("raw,expected", [
@@ -20,7 +20,7 @@ def test_parser_str_modes(raw, expected):
     """
     str field specs are parsed into correct SchemaField objects.
     """
-    sf = parse_field_spec("field_name", raw)
+    sf = SchemaParser.parse_field_spec("field_name", raw)
     assert sf == expected
 
 
@@ -45,7 +45,7 @@ def test_parse_int_modes(raw, expected):
     """
     int field specs are parsed into correct SchemaField objects.
     """
-    sf = parse_field_spec("field_name", raw)
+    sf = SchemaParser.parse_field_spec("field_name", raw)
     assert sf == expected
 
 
@@ -54,7 +54,7 @@ def test_parse_timestamp_ignores_extra(caplog):
     Extra data after 'timestamp:' is ignored with a warning.
     """
     get_test_logger("magicgenerator.parser", caplog)
-    sf = parse_field_spec("field_name", "timestamp:foo")
+    sf = SchemaParser.parse_field_spec("field_name", "timestamp:foo")
     assert sf == SchemaField(
         type="timestamp", mode="timestamp", args=[], const=None
     )
@@ -72,4 +72,4 @@ def test_parse_errors(raw):
     Invalid field specs raise SystemExit.
     """
     with pytest.raises(SystemExit):
-        parse_field_spec("field_name", raw)
+        SchemaParser.parse_field_spec("field_name", raw)
